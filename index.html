@@ -1,0 +1,3011 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>EXTEND — Seu conteúdo vai mais longe.</title>
+
+  <!-- Configurações de Web App Instalável (PWA) para Android e iPhone -->
+  <meta name="theme-color" content="#080B06" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="EXTEND" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- Ícone Oficial X Neon para Aba do Navegador e Tela Inicial do Celular -->
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='28' fill='%23080B06'/%3E%3Cpath d='M24 72 C4 86,2 98,12 102 C26 108,72 86,102 52 C118 34,118 20,104 18 C90 16,66 26,48 38 L53 42 C69 32,88 24,98 26 C107 28,105 38,92 52 C66 80,28 97,17 93 C10 90,13 82,29 70 Z' fill='%239EFF00'/%3E%3Cpolygon points='22,28 45,28 63,56 43,56' fill='%23E6FF00'/%3E%3Cpolygon points='82,28 102,28 73,56 56,56' fill='%23B8FF01'/%3E%3Cpolygon points='56,62 76,62 98,94 75,94' fill='%239EFF00'/%3E%3Cpolygon points='43,62 62,62 34,94 14,94' fill='%2326C400'/%3E%3C/svg%3E"
+  />
+  <link
+    rel="apple-touch-icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%23080B06'/%3E%3Cpath d='M24 72 C4 86,2 98,12 102 C26 108,72 86,102 52 C118 34,118 20,104 18 C90 16,66 26,48 38 L53 42 C69 32,88 24,98 26 C107 28,105 38,92 52 C66 80,28 97,17 93 C10 90,13 82,29 70 Z' fill='%239EFF00'/%3E%3Cpolygon points='22,28 45,28 63,56 43,56' fill='%23E6FF00'/%3E%3Cpolygon points='82,28 102,28 73,56 56,56' fill='%23B8FF01'/%3E%3Cpolygon points='56,62 76,62 98,94 75,94' fill='%239EFF00'/%3E%3Cpolygon points='43,62 62,62 34,94 14,94' fill='%2326C400'/%3E%3C/svg%3E"
+  />
+
+  <!-- Tailwind CSS e React 18 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #040603;
+      color: #f4f4f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+      overscroll-behavior-y: none;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
+
+    // Conjunto de ícones vetoriais minimalistas embutidos (zero dependência externa)
+    const SvgIcon = ({ children, className = 'w-4 h-4', strokeWidth = 2 }) => (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        {children}
+      </svg>
+    );
+
+    const Heart = ({ className, filled }) => (
+      <svg
+        viewBox="0 0 24 24"
+        fill={filled ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+      </svg>
+    );
+
+    const MessageCircle = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+      </SvgIcon>
+    );
+
+    const Plus = ({ className }) => (
+      <SvgIcon className={className} strokeWidth={2.5}>
+        <path d="M5 12h14" />
+        <path d="M12 5v14" />
+      </SvgIcon>
+    );
+
+    const Play = ({ className }) => (
+      <SvgIcon className={className}>
+        <polygon points="6 3 20 12 6 21 6 3" />
+      </SvgIcon>
+    );
+
+    const Pause = ({ className }) => (
+      <SvgIcon className={className}>
+        <rect x="14" y="4" width="4" height="16" rx="1" />
+        <rect x="6" y="4" width="4" height="16" rx="1" />
+      </SvgIcon>
+    );
+
+    const Volume2 = ({ className }) => (
+      <SvgIcon className={className}>
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+      </SvgIcon>
+    );
+
+    const VolumeX = ({ className }) => (
+      <SvgIcon className={className}>
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+        <line x1="22" y1="9" x2="16" y2="15" />
+        <line x1="16" y1="9" x2="22" y2="15" />
+      </SvgIcon>
+    );
+
+    const Maximize2 = ({ className }) => (
+      <SvgIcon className={className}>
+        <polyline points="15 3 21 3 21 9" />
+        <polyline points="9 21 3 21 3 15" />
+        <line x1="21" y1="3" x2="14" y2="10" />
+        <line x1="3" y1="21" x2="10" y2="14" />
+      </SvgIcon>
+    );
+
+    const Minimize2 = ({ className }) => (
+      <SvgIcon className={className}>
+        <polyline points="4 14 10 14 10 20" />
+        <polyline points="20 10 14 10 14 4" />
+        <line x1="14" y1="10" x2="21" y2="3" />
+        <line x1="3" y1="21" x2="10" y2="14" />
+      </SvgIcon>
+    );
+
+    const XIcon = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </SvgIcon>
+    );
+
+    const Lock = ({ className }) => (
+      <SvgIcon className={className}>
+        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      </SvgIcon>
+    );
+
+    const Send = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="m22 2-7 20-4-9-9-4Z" />
+        <path d="M22 2 11 13" />
+      </SvgIcon>
+    );
+
+    const ArrowLeft = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="m12 19-7-7 7-7" />
+        <path d="M19 12H5" />
+      </SvgIcon>
+    );
+
+    const Music = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M9 18V5l12-2v13" />
+        <circle cx="6" cy="18" r="3" />
+        <circle cx="18" cy="16" r="3" />
+      </SvgIcon>
+    );
+
+    const Folder = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+      </SvgIcon>
+    );
+
+    const Crown = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
+        <path d="M5 21h14" />
+      </SvgIcon>
+    );
+
+    const Camera = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+        <circle cx="12" cy="13" r="3" />
+      </SvgIcon>
+    );
+
+    const Wallet = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+        <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+      </SvgIcon>
+    );
+
+    const QrCode = ({ className }) => (
+      <SvgIcon className={className}>
+        <rect width="5" height="5" x="3" y="3" rx="1" />
+        <rect width="5" height="5" x="16" y="3" rx="1" />
+        <rect width="5" height="5" x="3" y="16" rx="1" />
+        <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
+        <path d="M21 21v.01" />
+        <path d="M12 7v3a2 2 0 0 1-2 2H7" />
+        <path d="M3 12h.01" />
+        <path d="M12 3h.01" />
+        <path d="M12 16v.01" />
+        <path d="M16 12h1" />
+        <path d="M21 12v.01" />
+        <path d="M12 21v-1" />
+      </SvgIcon>
+    );
+
+    const Copy = ({ className }) => (
+      <SvgIcon className={className}>
+        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+      </SvgIcon>
+    );
+
+    const CreditCard = ({ className }) => (
+      <SvgIcon className={className}>
+        <rect width="20" height="14" x="2" y="5" rx="2" />
+        <line x1="2" x2="22" y1="10" y2="10" />
+      </SvgIcon>
+    );
+
+    const Search = ({ className }) => (
+      <SvgIcon className={className}>
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
+      </SvgIcon>
+    );
+
+    const Bell = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      </SvgIcon>
+    );
+
+    const MoreHorizontal = ({ className }) => (
+      <SvgIcon className={className}>
+        <circle cx="12" cy="12" r="1" />
+        <circle cx="19" cy="12" r="1" />
+        <circle cx="5" cy="12" r="1" />
+      </SvgIcon>
+    );
+
+    const Flag = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+        <line x1="4" x2="4" y1="22" y2="15" />
+      </SvgIcon>
+    );
+
+    const Ban = ({ className }) => (
+      <SvgIcon className={className}>
+        <circle cx="12" cy="12" r="10" />
+        <path d="m4.9 4.9 14.2 14.2" />
+      </SvgIcon>
+    );
+
+    const Smartphone = ({ className }) => (
+      <SvgIcon className={className}>
+        <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+        <path d="M12 18h.01" />
+      </SvgIcon>
+    );
+
+    const Upload = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="17 8 12 3 7 8" />
+        <line x1="12" x2="12" y1="3" y2="15" />
+      </SvgIcon>
+    );
+
+    const Repeat2 = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="m2 9 3-3 3 3" />
+        <path d="M13 18H7a2 2 0 0 1-2-2V6" />
+        <path d="m22 15-3 3-3-3" />
+        <path d="M11 6h6a2 2 0 0 1 2 2v10" />
+      </SvgIcon>
+    );
+
+    const Users = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </SvgIcon>
+    );
+
+    const Tag = ({ className }) => (
+      <SvgIcon className={className}>
+        <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" />
+        <circle cx="7.5" cy="7.5" r=".5" fill="currentColor" />
+      </SvgIcon>
+    );
+
+    const FastForward = ({ className }) => (
+      <SvgIcon className={className}>
+        <polygon points="13 19 22 12 13 5 13 19" />
+        <polygon points="2 19 11 12 2 5 2 19" />
+      </SvgIcon>
+    );
+
+    const CheckCircle2 = ({ className }) => (
+      <SvgIcon className={className}>
+        <circle cx="12" cy="12" r="10" />
+        <path d="m9 12 2 2 4-4" />
+      </SvgIcon>
+    );
+
+    const Columns2 = ({ className }) => (
+      <SvgIcon className={className}>
+        <rect width="18" height="18" x="3" y="3" rx="2" />
+        <path d="M12 3v18" />
+      </SvgIcon>
+    );
+
+    // Logotipo oficial EXTEND fiel à marca aprovada
+    function ExtendLogo({ className = 'h-11 w-auto' }) {
+      return (
+        <svg
+          viewBox="0 0 680 185"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className={className}
+          aria-label="EXTEND - Seu conteúdo vai mais longe."
+        >
+          <defs>
+            <linearGradient id="extChrome" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="48%" stopColor="#E6E9EC" />
+              <stop offset="53%" stopColor="#AEB4BC" />
+              <stop offset="100%" stopColor="#F5F7F9" />
+            </linearGradient>
+            <linearGradient id="extNeonMain" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#E6FF00" />
+              <stop offset="45%" stopColor="#9EFF00" />
+              <stop offset="100%" stopColor="#26C400" />
+            </linearGradient>
+            <linearGradient id="extNeonAlt" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#1CA800" />
+              <stop offset="50%" stopColor="#B8FF01" />
+              <stop offset="100%" stopColor="#F2FF49" />
+            </linearGradient>
+            <linearGradient id="extOrbitGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#D9FF00" />
+              <stop offset="50%" stopColor="#76F200" />
+              <stop offset="100%" stopColor="#E6FF2E" />
+            </linearGradient>
+          </defs>
+
+          <path
+            d="M 218 52 C 305 14, 412 4, 422 28 C 428 43, 392 67, 345 87 L 336 81 C 378 62, 404 42, 399 31 C 392 14, 304 23, 224 58 Z"
+            fill="url(#extOrbitGrad)"
+            stroke="#050704"
+            strokeWidth="5"
+            strokeLinejoin="round"
+          />
+
+          <path
+            d="M 48 54 C 32 54, 24 62, 22 76 L 16 112 C 14 126, 22 134, 38 134 L 122 134 L 126 114 L 46 114 L 48 102 L 118 102 L 121 84 L 51 84 L 53 74 L 131 74 L 135 54 Z"
+            fill="url(#extChrome)"
+            stroke="#050704"
+            strokeWidth="9"
+            paintOrder="stroke fill"
+            strokeLinejoin="round"
+          />
+
+          <g
+            fill="url(#extChrome)"
+            stroke="#050704"
+            strokeWidth="9"
+            paintOrder="stroke fill"
+            strokeLinejoin="round"
+          >
+            <path d="M 274 54 L 372 54 L 368 74 L 331 74 L 320 134 L 294 134 L 305 74 L 270 74 Z" />
+            <path d="M 382 54 L 468 54 L 464 74 L 404 74 L 402 84 L 456 84 L 453 102 L 399 102 L 397 114 L 460 114 L 456 134 L 368 134 Z" />
+            <path d="M 480 54 L 506 54 L 538 101 L 547 54 L 572 54 L 557 134 L 532 134 L 500 87 L 491 134 L 466 134 Z" />
+            <path d="M 584 54 L 636 54 C 658 54, 668 66, 664 88 L 660 106 C 656 124, 642 134, 620 134 L 569 134 Z M 606 74 L 598 114 L 621 114 C 631 114, 636 109, 638 99 L 640 89 C 642 79, 637 74, 627 74 Z" />
+          </g>
+
+          <g stroke="#050704" strokeWidth="7" strokeLinejoin="round">
+            <polygon points="122,42 162,42 206,86 172,86" fill="url(#extNeonMain)" />
+            <polygon points="236,42 276,42 226,86 196,86" fill="url(#extNeonAlt)" />
+            <polygon points="196,94 230,94 268,142 228,142" fill="url(#extNeonMain)" />
+            <polygon points="172,94 204,94 114,158 76,162" fill="url(#extNeonAlt)" />
+          </g>
+
+          <path
+            d="M 102 132 C 42 152, 12 168, 18 175 C 25 182, 76 168, 138 142 L 128 136 C 78 156, 42 166, 37 162 C 33 158, 60 144, 110 127 Z"
+            fill="url(#extOrbitGrad)"
+            stroke="#050704"
+            strokeWidth="4.5"
+            strokeLinejoin="round"
+          />
+
+          <text
+            x="148"
+            y="172"
+            fontFamily="Inter, system-ui, -apple-system, sans-serif"
+            fontWeight="800"
+            fontStyle="italic"
+            fontSize="27"
+            letterSpacing="-0.4"
+            stroke="#050704"
+            strokeWidth="7"
+            paintOrder="stroke fill"
+            strokeLinejoin="round"
+          >
+            <tspan fill="#FFFFFF">Seu conteúdo vai </tspan>
+            <tspan fill="#B8FF01">mais longe.</tspan>
+          </text>
+        </svg>
+      );
+    }
+
+    // Ícone oficial do aplicativo EXTEND (X Neon com Órbita Dinâmica)
+    function ExtendIcon({ className = 'w-6 h-6' }) {
+      return (
+        <svg
+          viewBox="0 0 120 120"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className={className}
+          aria-label="Ícone EXTEND"
+        >
+          <defs>
+            <linearGradient id="iconX1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#F0FF42" />
+              <stop offset="50%" stopColor="#9EFF00" />
+              <stop offset="100%" stopColor="#1DB900" />
+            </linearGradient>
+            <linearGradient id="iconX2" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#189E00" />
+              <stop offset="50%" stopColor="#B8FF01" />
+              <stop offset="100%" stopColor="#F4FF61" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M 24 72 C 4 86, 2 98, 12 102 C 26 108, 72 86, 102 52 C 118 34, 118 20, 104 18 C 90 16, 66 26, 48 38 L 53 42 C 69 32, 88 24, 98 26 C 107 28, 105 38, 92 52 C 66 80, 28 97, 17 93 C 10 90, 13 82, 29 70 Z"
+            fill="url(#iconX1)"
+          />
+          <polygon points="22,28 45,28 63,56 43,56" fill="url(#iconX1)" />
+          <polygon points="82,28 102,28 73,56 56,56" fill="url(#iconX2)" />
+          <polygon points="56,62 76,62 98,94 75,94" fill="url(#iconX1)" />
+          <polygon points="43,62 62,62 34,94 14,94" fill="url(#iconX2)" />
+        </svg>
+      );
+    }
+
+    const INITIAL_PROFILES = {
+      '@voce': {
+        handle: '@voce',
+        name: 'Você (Criador)',
+        avatar:
+          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=240&q=80',
+        bio: 'Fotografia urbana, direção visual e experimentos em movimento.',
+        isPro: false,
+        progress: 72,
+        folders: ['Todas', 'Autoral', 'Urbano', 'Exclusivos'],
+      },
+      '@clara.luz': {
+        handle: '@clara.luz',
+        name: 'Clara Luz',
+        avatar:
+          'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=240&q=80',
+        bio: 'Luz natural, retratos 3:4 e cinema independente.',
+        isPro: true,
+        progress: 86,
+        folders: ['Todas', 'Retratos', 'Viagens'],
+      },
+      '@atelier.norte': {
+        handle: '@atelier.norte',
+        name: 'Atelier Norte',
+        avatar:
+          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=240&q=80',
+        bio: 'Design autoral em madeira e iluminação minimalista.',
+        isPro: true,
+        progress: 91,
+        folders: ['Todas', 'Coleção 2026', 'Iluminação'],
+      },
+      '@lucas.cine': {
+        handle: '@lucas.cine',
+        name: 'Lucas Cine',
+        avatar:
+          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&q=80',
+        bio: 'Documentários 16:9 e color grading.',
+        isPro: true,
+        progress: 95,
+        folders: ['Todas', 'Documentários', 'Exclusivos'],
+      },
+    };
+
+    const INITIAL_POSTS = [
+      {
+        id: 'p1',
+        type: 'fotos',
+        author: '@clara.luz',
+        collabWith: '@lucas.cine',
+        folder: 'Retratos',
+        caption: 'Hora dourada no mirante sem filtros artificiais.',
+        mediaUrl:
+          'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80',
+        audioTrack: 'Brisa Analógica • 15s',
+        progress: 78,
+        likes: 412,
+        liked: false,
+        extendedByMe: false,
+        isCommercial: false,
+        comments: [
+          { id: 'c1', user: '@atelier.norte', text: 'Essa paleta ficou impecável!' },
+        ],
+      },
+      {
+        id: 'p2',
+        type: 'fotos',
+        author: '@atelier.norte',
+        folder: 'Iluminação',
+        caption: 'Luminária Escultural Linha Solis • Edição numerada em freijó.',
+        mediaUrl:
+          'https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=900&q=80',
+        progress: 88,
+        likes: 629,
+        liked: false,
+        extendedByMe: false,
+        isCommercial: true,
+        ctaLabel: 'Iniciar conversa',
+        productTag: {
+          name: 'Luminária Solis Freijó',
+          price: 'R$ 340,00',
+          x: 56,
+          y: 44,
+        },
+        comments: [],
+      },
+      {
+        id: 'p3',
+        type: 'fotos',
+        author: '@voce',
+        folder: 'Urbano',
+        caption: 'Geometria noturna e reflexos na chuva.',
+        mediaUrl:
+          'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=900&q=80',
+        audioTrack: 'Sintetizador Noturno • 15s',
+        progress: 64,
+        likes: 198,
+        liked: false,
+        extendedByMe: false,
+        isCommercial: false,
+        comments: [],
+      },
+      {
+        id: 'c1',
+        type: 'curtos',
+        author: '@clara.luz',
+        folder: 'Viagens',
+        caption: 'Transição em 1 take nas falésias ao amanhecer.',
+        mediaUrl:
+          'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80',
+        duration: '0:24',
+        progress: 84,
+        likes: 930,
+        liked: false,
+        extendedByMe: false,
+        isCommercial: false,
+        comments: [],
+      },
+      {
+        id: 'c2',
+        type: 'curtos',
+        author: '@voce',
+        folder: 'Autoral',
+        caption: 'Bastidores da montagem em estúdio minimalista.',
+        mediaUrl:
+          'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=900&q=80',
+        duration: '0:18',
+        progress: 71,
+        likes: 285,
+        liked: false,
+        extendedByMe: false,
+        isCommercial: false,
+        comments: [],
+      },
+      {
+        id: 'l1',
+        type: 'longos',
+        author: '@lucas.cine',
+        folder: 'Documentários',
+        title: 'A Arquitetura da Luz: Como Filmar Sem Equipe Grande',
+        caption: 'Guia prático de enquadramento, lentes fixas e som direto.',
+        mediaUrl:
+          'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80',
+        duration: '18:42',
+        chapters: ['00:00 Abertura', '05:15 Luz Lateral', '12:40 Som Direto'],
+        progress: 92,
+        likes: 1240,
+        liked: false,
+        extendedByMe: false,
+        isCommercial: false,
+        exclusivePrice: 0,
+        unlocked: true,
+        comments: [],
+      },
+      {
+        id: 'l2',
+        type: 'longos',
+        author: '@lucas.cine',
+        folder: 'Exclusivos',
+        title: 'Masterclass Color Grading Cinematográfico em 4K',
+        caption: 'Fluxo completo de curvas, LUTs autorais e pele natural.',
+        mediaUrl:
+          'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=1200&q=80',
+        duration: '42:10',
+        chapters: ['00:00 Espaço de Cor', '14:20 Tons de Pele', '29:00 Exportação'],
+        progress: 89,
+        likes: 780,
+        liked: false,
+        extendedByMe: false,
+        isCommercial: false,
+        exclusivePrice: 14.9,
+        unlocked: false,
+        comments: [],
+      },
+    ];
+
+    const INITIAL_CHATS = [
+      {
+        id: 'chat1',
+        withHandle: '@clara.luz',
+        status: 'approved',
+        tag: 'Parceria',
+        messages: [
+          {
+            id: 'm1',
+            from: '@clara.luz',
+            text: 'Oi! Vi seu post noturno no feed e curti muito a estética.',
+            time: '14:12',
+          },
+          {
+            id: 'm2',
+            from: '@voce',
+            text: 'Valeu, Clara! Vamos marcar uma collab 3:4 essa semana.',
+            time: '14:15',
+          },
+        ],
+      },
+      {
+        id: 'chat2',
+        withHandle: '@lucas.cine',
+        status: 'pending',
+        tag: 'Trabalho / Orçamento',
+        messages: [],
+      },
+    ];
+
+    const INITIAL_TRANSACTIONS = [
+      {
+        id: 'tx1',
+        label: 'Vídeo Exclusivo 16:9 vendido',
+        gross: 14.9,
+        net: 12.67,
+        splitInfo: '85% seu • 15% EXTEND',
+        date: 'Hoje',
+      },
+      {
+        id: 'tx2',
+        label: 'Apoio recebido na Foto 3:4',
+        gross: 10.0,
+        net: 8.0,
+        splitInfo: '80% seu • 20% EXTEND',
+        date: 'Ontem',
+      },
+    ];
+
+    function App() {
+      const [profiles, setProfiles] = useState(INITIAL_PROFILES);
+      const [posts, setPosts] = useState(INITIAL_POSTS);
+      const [chats, setChats] = useState(INITIAL_CHATS);
+      const [transactions, setTransactions] = useState(INITIAL_TRANSACTIONS);
+      const [walletBalance, setWalletBalance] = useState(184.5);
+
+      const [nav, setNav] = useState('feed');
+      const [activeTab, setActiveTab] = useState('fotos');
+      const [viewedHandle, setViewedHandle] = useState('@voce');
+      const [profileTab, setProfileTab] = useState('fotos');
+      const [selectedFolder, setSelectedFolder] = useState('Todas');
+      const [activeChatId, setActiveChatId] = useState('chat1');
+      const [chatInput, setChatInput] = useState('');
+
+      const [dailyBoostUsed, setDailyBoostUsed] = useState(false);
+      const [playingId, setPlayingId] = useState(null);
+      const [muted, setMuted] = useState(false);
+      const [speed2xId, setSpeed2xId] = useState(null);
+      const [fullscreenPost, setFullscreenPost] = useState(null);
+      const [miniPlayerPost, setMiniPlayerPost] = useState(null);
+      const [activeProductHotspot, setActiveProductHotspot] = useState(null);
+
+      const [activeStoryHandle, setActiveStoryHandle] = useState(null);
+      const [commentPostId, setCommentPostId] = useState(null);
+      const [commentDraft, setCommentDraft] = useState('');
+      const [duetSourcePost, setDuetSourcePost] = useState(null);
+      const [duetCaption, setDuetCaption] = useState('');
+      const [chatRequestTarget, setChatRequestTarget] = useState(null);
+      const [safetyPost, setSafetyPost] = useState(null);
+
+      const [showSearchModal, setShowSearchModal] = useState(false);
+      const [searchQuery, setSearchQuery] = useState('');
+      const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+      const [showAccountModal, setShowAccountModal] = useState(false);
+      const [showMobileModal, setShowMobileModal] = useState(false);
+      const [mobileFrameMode, setMobileFrameMode] = useState(false);
+
+      const [showWalletModal, setShowWalletModal] = useState(false);
+      const [pixWithdrawKey, setPixWithdrawKey] = useState('');
+      const [showProModal, setShowProModal] = useState(false);
+
+      const [checkoutData, setCheckoutData] = useState(null);
+      const [paymentMethod, setPaymentMethod] = useState('pix');
+      const [copiedPix, setCopiedPix] = useState(false);
+
+      const [pubFormat, setPubFormat] = useState('fotos');
+      const [pubScope, setPubScope] = useState('brasil');
+      const [pubCaption, setPubCaption] = useState('');
+      const [pubTitle, setPubTitle] = useState('');
+      const [pubCollab, setPubCollab] = useState('');
+      const [pubPreviewUrl, setPubPreviewUrl] = useState(
+        'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=900&q=80'
+      );
+      const [pubExclusivePrice, setPubExclusivePrice] = useState('');
+      const [manualCommercial, setManualCommercial] = useState(null);
+
+      const [editName, setEditName] = useState(INITIAL_PROFILES['@voce'].name);
+      const [editHandle, setEditHandle] = useState('@voce');
+
+      const [toast, setToast] = useState(null);
+      const avatarInputRef = useRef(null);
+      const postMediaInputRef = useRef(null);
+
+      const showToast = (msg) => {
+        setToast(msg);
+      };
+
+      useEffect(() => {
+        if (!toast) return;
+        const t = setTimeout(() => setToast(null), 2800);
+        return () => clearTimeout(t);
+      }, [toast]);
+
+      const commercialKeywords = /(r\$|us\$|\$|promo[cç][aã]o|desconto|compre|oferta|or[cç]amento|loja|venda|frete|entrega|encomenda)/i;
+      const autoDetectedCommercial = commercialKeywords.test(`${pubTitle} ${pubCaption}`);
+      const isCommercialPost =
+        manualCommercial !== null ? manualCommercial : autoDetectedCommercial;
+      const commercialPriceUsd = isCommercialPost && pubScope === 'perto' ? 4 : 3;
+      const commercialPriceBrl = commercialPriceUsd * 5.5;
+
+      const formatBRL = (val) =>
+        val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+      const openUserProfile = (handle, initialSubTab = 'fotos') => {
+        const safeHandle = profiles[handle] ? handle : '@voce';
+        setViewedHandle(safeHandle);
+        setProfileTab(initialSubTab);
+        setSelectedFolder('Todas');
+        setNav('perfil');
+      };
+
+      const handleToggleLike = (postId) => {
+        setPosts((prev) =>
+          prev.map((p) => {
+            if (p.id !== postId) return p;
+            const nextLiked = !p.liked;
+            return {
+              ...p,
+              liked: nextLiked,
+              likes: nextLiked ? p.likes + 1 : p.likes - 1,
+              progress: Math.min(100, p.progress + (nextLiked ? 4 : -4)),
+            };
+          })
+        );
+      };
+
+      const handleDailyBoost = (postId) => {
+        if (dailyBoostUsed) {
+          showToast('Você já usou seu Impulso diário gratuito.');
+          return;
+        }
+        setDailyBoostUsed(true);
+        setPosts((prev) =>
+          prev.map((p) =>
+            p.id === postId
+              ? { ...p, progress: Math.min(100, p.progress + 14) }
+              : p
+          )
+        );
+        showToast('Impulso aplicado! O conteúdo avançou na barra de alcance.');
+      };
+
+      const handleExtendRepost = (postId) => {
+        setPosts((prev) =>
+          prev.map((p) => {
+            if (p.id !== postId) return p;
+            const nextExt = !p.extendedByMe;
+            return {
+              ...p,
+              extendedByMe: nextExt,
+              progress: Math.min(100, p.progress + (nextExt ? 9 : -9)),
+            };
+          })
+        );
+        showToast('Conteúdo estendido para novos usuários!');
+      };
+
+      const handleAvatarFileChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const objectUrl = URL.createObjectURL(file);
+        setProfiles((prev) => ({
+          ...prev,
+          '@voce': {
+            ...prev['@voce'],
+            avatar: objectUrl,
+          },
+        }));
+        showToast('Foto de perfil atualizada!');
+      };
+
+      const handlePostMediaUpload = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const objectUrl = URL.createObjectURL(file);
+        setPubPreviewUrl(objectUrl);
+        showToast('Mídia carregada do aparelho.');
+      };
+
+      const finalizePublish = () => {
+        const cleanCollab = pubCollab.trim();
+        const validCollab =
+          cleanCollab && profiles[cleanCollab] && cleanCollab !== '@voce'
+            ? cleanCollab
+            : undefined;
+        const parsedPrice =
+          pubFormat === 'longos' && parseFloat(pubExclusivePrice) > 0
+            ? parseFloat(pubExclusivePrice)
+            : 0;
+
+        const newPost = {
+          id: `post_${Date.now()}`,
+          type: pubFormat,
+          author: '@voce',
+          collabWith: validCollab,
+          folder: parsedPrice > 0 ? 'Exclusivos' : 'Autoral',
+          title: pubFormat === 'longos' ? pubTitle || 'Novo Vídeo Longo' : undefined,
+          caption: pubCaption || 'Compartilhado no EXTEND.',
+          mediaUrl: pubPreviewUrl,
+          duration: pubFormat === 'curtos' ? '0:20' : pubFormat === 'longos' ? '12:30' : undefined,
+          chapters:
+            pubFormat === 'longos'
+              ? ['00:00 Introdução', '04:15 Desenvolvimento', '09:30 Conclusão']
+              : undefined,
+          progress: 45,
+          likes: 1,
+          liked: true,
+          extendedByMe: false,
+          isCommercial: isCommercialPost,
+          ctaLabel: isCommercialPost ? 'Iniciar conversa' : undefined,
+          exclusivePrice: parsedPrice,
+          unlocked: parsedPrice === 0,
+          comments: [],
+        };
+
+        setPosts((prev) => [newPost, ...prev]);
+        setActiveTab(pubFormat);
+        setPubCaption('');
+        setPubTitle('');
+        setPubCollab('');
+        setPubExclusivePrice('');
+        setManualCommercial(null);
+        setNav('feed');
+        showToast(
+          isCommercialPost
+            ? 'Passe Comercial ativado! Seu conteúdo entrou na onda inicial.'
+            : 'Publicado! Seu conteúdo já está sendo entregue.'
+        );
+      };
+
+      const handlePublishClick = () => {
+        if (isCommercialPost) {
+          setCheckoutData({
+            kind: 'commercial_post',
+            title: `Passe Comercial (US$ ${commercialPriceUsd})`,
+            subtitle:
+              pubScope === 'perto'
+                ? 'Inclui direcionamento regional (+US$ 1) e botão de chat direto'
+                : 'Entrega imediata na 1ª onda + botão de conversa liberada',
+            amountBrl: commercialPriceBrl,
+          });
+          return;
+        }
+        finalizePublish();
+      };
+
+      const handleConfirmPayment = () => {
+        if (!checkoutData) return;
+
+        if (checkoutData.kind === 'commercial_post') {
+          setCheckoutData(null);
+          finalizePublish();
+          return;
+        }
+
+        if (checkoutData.kind === 'unlock_video') {
+          const { postId, amountBrl } = checkoutData;
+          setPosts((prev) =>
+            prev.map((p) => (p.id === postId ? { ...p, unlocked: true } : p))
+          );
+          setTransactions((prev) => [
+            {
+              id: `tx_${Date.now()}`,
+              label: 'Desbloqueio Vídeo Exclusivo 16:9',
+              gross: amountBrl,
+              net: Number((amountBrl * 0.85).toFixed(2)),
+              splitInfo: '85% criador • 15% EXTEND',
+              date: 'Agora',
+            },
+            ...prev,
+          ]);
+          setCheckoutData(null);
+          showToast('Vídeo exclusivo desbloqueado!');
+          return;
+        }
+
+        if (checkoutData.kind === 'support') {
+          const { postId, amountBrl } = checkoutData;
+          setPosts((prev) =>
+            prev.map((p) =>
+              p.id === postId
+                ? { ...p, progress: Math.min(100, p.progress + 18) }
+                : p
+            )
+          );
+          setTransactions((prev) => [
+            {
+              id: `tx_${Date.now()}`,
+              label: 'Apoio Premiado enviado',
+              gross: amountBrl,
+              net: Number((amountBrl * 0.8).toFixed(2)),
+              splitInfo: '80% criador • 20% EXTEND',
+              date: 'Agora',
+            },
+            ...prev,
+          ]);
+          setCheckoutData(null);
+          showToast(`Apoio de ${formatBRL(amountBrl)} enviado!`);
+          return;
+        }
+
+        if (checkoutData.kind === 'pro_plan') {
+          setProfiles((prev) => ({
+            ...prev,
+            '@voce': { ...prev['@voce'], isPro: true },
+          }));
+          setCheckoutData(null);
+          setShowProModal(false);
+          showToast('Assinatura EXTEND Pro ativada!');
+        }
+      };
+
+      const openCommercialChat = (targetHandle, initialText) => {
+        const existing = chats.find((c) => c.withHandle === targetHandle);
+        if (existing) {
+          setChats((prev) =>
+            prev.map((c) =>
+              c.id === existing.id
+                ? {
+                    ...c,
+                    status: 'approved',
+                    messages: initialText
+                      ? [
+                          ...c.messages,
+                          {
+                            id: `m_${Date.now()}`,
+                            from: '@voce',
+                            text: initialText,
+                            time: 'Agora',
+                          },
+                        ]
+                      : c.messages,
+                  }
+                : c
+            )
+          );
+          setActiveChatId(existing.id);
+        } else {
+          const newChat = {
+            id: `chat_${Date.now()}`,
+            withHandle: targetHandle,
+            status: 'approved',
+            tag: 'Comercial',
+            messages: initialText
+              ? [
+                  {
+                    id: `m_${Date.now()}`,
+                    from: '@voce',
+                    text: initialText,
+                    time: 'Agora',
+                  },
+                ]
+              : [],
+          };
+          setChats((prev) => [newChat, ...prev]);
+          setActiveChatId(newChat.id);
+        }
+        setActiveProductHotspot(null);
+        setNav('chat');
+      };
+
+      const handleSendChatMessage = (e) => {
+        e.preventDefault();
+        if (!chatInput.trim()) return;
+        setChats((prev) =>
+          prev.map((c) =>
+            c.id === activeChatId
+              ? {
+                  ...c,
+                  messages: [
+                    ...c.messages,
+                    {
+                      id: `m_${Date.now()}`,
+                      from: '@voce',
+                      text: chatInput.trim(),
+                      time: 'Agora',
+                    },
+                  ],
+                }
+              : c
+          )
+        );
+        setChatInput('');
+      };
+
+      const handleRequestChatConnection = (targetHandle, tag) => {
+        const existing = chats.find((c) => c.withHandle === targetHandle);
+        if (existing) {
+          setActiveChatId(existing.id);
+          setChatRequestTarget(null);
+          setNav('chat');
+          return;
+        }
+        const newChat = {
+          id: `chat_${Date.now()}`,
+          withHandle: targetHandle,
+          status: 'approved',
+          tag,
+          messages: [
+            {
+              id: `m_${Date.now()}`,
+              from: '@voce',
+              text: `Solicitação de conexão enviada (${tag}).`,
+              time: 'Agora',
+            },
+          ],
+        };
+        setChats((prev) => [newChat, ...prev]);
+        setActiveChatId(newChat.id);
+        setChatRequestTarget(null);
+        setNav('chat');
+        showToast(`Solicitação enviada para ${targetHandle}.`);
+      };
+
+      const handleAddComment = (e) => {
+        e.preventDefault();
+        if (!commentDraft.trim() || !commentPostId) return;
+        setPosts((prev) =>
+          prev.map((p) =>
+            p.id === commentPostId
+              ? {
+                  ...p,
+                  progress: Math.min(100, p.progress + 5),
+                  comments: [
+                    ...p.comments,
+                    {
+                      id: `c_${Date.now()}`,
+                      user: '@voce',
+                      text: commentDraft.trim(),
+                    },
+                  ],
+                }
+              : p
+          )
+        );
+        setCommentDraft('');
+      };
+
+      const handlePublishDuet = () => {
+        if (!duetSourcePost) return;
+        const newDuet = {
+          id: `duet_${Date.now()}`,
+          type: 'curtos',
+          author: '@voce',
+          duetFrom: duetSourcePost.author,
+          folder: 'Autoral',
+          caption: duetCaption || `Dueto com ${duetSourcePost.author}`,
+          mediaUrl: duetSourcePost.mediaUrl,
+          duration: '0:15',
+          progress: 58,
+          likes: 1,
+          liked: true,
+          extendedByMe: false,
+          isCommercial: false,
+          comments: [],
+        };
+        setPosts((prev) => [newDuet, ...prev]);
+        setDuetSourcePost(null);
+        setDuetCaption('');
+        setActiveTab('curtos');
+        setNav('feed');
+        showToast('Dueto 9:16 publicado na timeline!');
+      };
+
+      const copyPixCode = () => {
+        const code = '00020126580014br.gov.bcb.pix0136extend-pagamentos-oficial-20265204000053039865802BR';
+        try {
+          const el = document.createElement('textarea');
+          el.value = code;
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand('copy');
+          document.body.removeChild(el);
+        } catch (_) {}
+        setCopiedPix(true);
+        setTimeout(() => setCopiedPix(false), 2000);
+      };
+
+      const currentFeedPosts = posts.filter((p) => p.type === activeTab);
+      const viewedProfile = profiles[viewedHandle] || profiles['@voce'];
+      const isMyProfile = viewedHandle === '@voce';
+
+      const profilePosts = posts.filter((p) => {
+        const belongsToUser =
+          p.author === viewedHandle || p.collabWith === viewedHandle;
+        if (!belongsToUser || p.type !== profileTab) return false;
+        if (selectedFolder !== 'Todas' && p.folder !== selectedFolder) return false;
+        return true;
+      });
+
+      const activeChat = chats.find((c) => c.id === activeChatId) || chats[0];
+      const commentPost = posts.find((p) => p.id === commentPostId);
+
+      return (
+        <div className="min-h-screen bg-[#040603] text-zinc-100 flex justify-center font-sans selection:bg-[#B8FF01] selection:text-black">
+          <div
+            className={`w-full flex flex-col bg-[#080B06] min-h-screen relative transition-all duration-300 ${
+              mobileFrameMode
+                ? 'max-w-[390px] my-3 rounded-[38px] border-2 border-[#B8FF01]/40 shadow-[0_0_50px_rgba(184,255,1,0.12)] overflow-hidden min-h-[780px]'
+                : 'max-w-[440px] sm:border-x sm:border-white/5'
+            }`}
+          >
+            {mobileFrameMode && (
+              <div className="bg-[#050704] px-6 pt-2.5 pb-1 flex items-center justify-between text-[11px] font-semibold text-zinc-300">
+                <span>9:41</span>
+                <div className="w-20 h-4 bg-black rounded-full border border-white/10" />
+                <div className="flex items-center gap-1.5 text-[#B8FF01]">
+                  <span>5G</span>
+                  <span className="w-4 h-2 rounded-xs bg-[#B8FF01] inline-block" />
+                </div>
+              </div>
+            )}
+
+            {toast && (
+              <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-[#11150E] border border-[#B8FF01]/50 text-[#B8FF01] text-xs font-medium px-3.5 py-2 rounded-full shadow-lg flex items-center gap-2 whitespace-nowrap">
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                <span>{toast}</span>
+              </div>
+            )}
+
+            {/* HEADER SUPERIOR */}
+            <header className="sticky top-0 z-30 bg-[#080B06]/95 backdrop-blur-md border-b border-white/5 px-3.5 pt-2.5 pb-2">
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  onClick={() => setNav('feed')}
+                  className="text-left focus:outline-none cursor-pointer shrink-0"
+                  title="EXTEND — Seu conteúdo vai mais longe."
+                >
+                  <ExtendLogo className="h-11 w-auto" />
+                </button>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setShowMobileModal(true)}
+                    className={`w-7 h-7 rounded-full flex items-center justify-center border transition cursor-pointer ${
+                      mobileFrameMode
+                        ? 'border-[#B8FF01] bg-[#B8FF01]/15 text-[#B8FF01]'
+                        : 'border-white/10 bg-[#11150E] text-zinc-400 hover:text-[#B8FF01]'
+                    }`}
+                    title="Instalar no Celular"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                  </button>
+
+                  <button
+                    onClick={() => setShowSearchModal(true)}
+                    className="w-7 h-7 rounded-full bg-[#11150E] border border-white/10 flex items-center justify-center text-zinc-400 hover:text-[#B8FF01] transition cursor-pointer"
+                    title="Buscar"
+                  >
+                    <Search className="w-3.5 h-3.5" />
+                  </button>
+
+                  <button
+                    onClick={() => setShowNotificationsModal(true)}
+                    className="relative w-7 h-7 rounded-full bg-[#11150E] border border-white/10 flex items-center justify-center text-zinc-400 hover:text-[#B8FF01] transition cursor-pointer"
+                    title="Notificações"
+                  >
+                    <Bell className="w-3.5 h-3.5" />
+                    <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#B8FF01]" />
+                  </button>
+
+                  <button
+                    onClick={() => setShowAccountModal(true)}
+                    className="h-7 px-2.5 rounded-full bg-[#11150E] border border-white/10 text-[11px] font-medium text-zinc-300 hover:border-[#B8FF01]/40 hover:text-[#B8FF01] transition cursor-pointer"
+                  >
+                    Conta
+                  </button>
+                </div>
+              </div>
+
+              {nav === 'feed' && (
+                <div className="mt-2.5 flex items-center justify-center">
+                  <div className="inline-flex bg-[#11150E] p-1 rounded-full border border-white/5 w-full">
+                    {[
+                      { id: 'fotos', label: 'Fotos' },
+                      { id: 'curtos', label: 'Curtos' },
+                      { id: 'longos', label: 'Longos' },
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex-1 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer ${
+                          activeTab === tab.id
+                            ? 'bg-[#B8FF01] text-[#060805] shadow-[0_0_12px_rgba(184,255,1,0.35)]'
+                            : 'text-zinc-400 hover:text-zinc-200'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </header>
+
+            {/* CONTEÚDO PRINCIPAL */}
+            <main className="flex-1 overflow-y-auto pb-6">
+              {nav === 'feed' && (
+                <div className="px-3.5 pt-3 space-y-4">
+                  {/* Stories */}
+                  <div className="flex items-center gap-3 overflow-x-auto pb-1 no-scrollbar">
+                    <button
+                      onClick={() => setActiveStoryHandle('@voce')}
+                      className="flex flex-col items-center gap-1 shrink-0 cursor-pointer group"
+                    >
+                      <div className="relative p-0.5 rounded-2xl bg-gradient-to-tr from-[#26C400] to-[#E6FF00]">
+                        <img
+                          src={profiles['@voce'].avatar}
+                          alt="Seu story"
+                          className="w-12 h-12 rounded-[14px] object-cover border-2 border-[#080B06]"
+                        />
+                        <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#B8FF01] text-black flex items-center justify-center text-[11px] font-bold border border-[#080B06]">
+                          +
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-zinc-400 group-hover:text-zinc-200">
+                        Seu story
+                      </span>
+                    </button>
+
+                    {['@clara.luz', '@atelier.norte', '@lucas.cine'].map((h) => {
+                      const prof = profiles[h];
+                      return (
+                        <button
+                          key={h}
+                          onClick={() => setActiveStoryHandle(h)}
+                          className="flex flex-col items-center gap-1 shrink-0 cursor-pointer group"
+                        >
+                          <div className="p-0.5 rounded-2xl bg-gradient-to-tr from-[#26C400] to-[#B8FF01]">
+                            <img
+                              src={prof.avatar}
+                              alt={prof.name}
+                              className="w-12 h-12 rounded-[14px] object-cover border-2 border-[#080B06]"
+                            />
+                          </div>
+                          <span className="text-[10px] text-zinc-400 group-hover:text-zinc-200 max-w-[58px] truncate">
+                            {h.replace('@', '')}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Posts do Feed */}
+                  {currentFeedPosts.map((post) => {
+                    const authorProf = profiles[post.author] || profiles['@voce'];
+                    const collabProf = post.collabWith
+                      ? profiles[post.collabWith]
+                      : null;
+                    const isPlaying = playingId === post.id;
+
+                    return (
+                      <article
+                        key={post.id}
+                        className="bg-[#11150E] rounded-3xl border border-white/5 overflow-hidden"
+                      >
+                        {post.extendedByMe && (
+                          <div className="px-3.5 pt-2 flex items-center gap-1.5 text-[10px] text-[#B8FF01] font-medium">
+                            <Repeat2 className="w-3 h-3" />
+                            <span>Estendido por @voce</span>
+                          </div>
+                        )}
+
+                        {post.duetFrom && (
+                          <div className="px-3.5 pt-2 flex items-center gap-1.5 text-[10px] text-[#B8FF01] font-medium">
+                            <Columns2 className="w-3 h-3" />
+                            <span>Dueto com {post.duetFrom}</span>
+                          </div>
+                        )}
+
+                        <div className="px-3.5 py-2.5 flex items-center justify-between">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <button
+                              onClick={() => openUserProfile(post.author, post.type)}
+                              className="relative flex items-center shrink-0 cursor-pointer"
+                            >
+                              <img
+                                src={authorProf.avatar}
+                                alt={authorProf.name}
+                                className="w-8 h-8 rounded-full object-cover ring-1 ring-[#B8FF01]/50"
+                              />
+                              {collabProf && (
+                                <img
+                                  src={collabProf.avatar}
+                                  alt={collabProf.name}
+                                  className="w-6 h-6 rounded-full object-cover -ml-2 ring-2 ring-[#11150E]"
+                                />
+                              )}
+                            </button>
+
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <button
+                                  onClick={() =>
+                                    openUserProfile(post.author, post.type)
+                                  }
+                                  className="text-xs font-semibold text-zinc-100 hover:text-[#B8FF01] truncate cursor-pointer"
+                                >
+                                  {post.author}
+                                </button>
+                                {collabProf && (
+                                  <>
+                                    <span className="text-[10px] text-zinc-500">
+                                      e
+                                    </span>
+                                    <button
+                                      onClick={() =>
+                                        openUserProfile(
+                                          collabProf.handle,
+                                          post.type
+                                        )
+                                      }
+                                      className="text-xs font-semibold text-zinc-100 hover:text-[#B8FF01] truncate cursor-pointer"
+                                    >
+                                      {collabProf.handle}
+                                    </button>
+                                  </>
+                                )}
+                                {authorProf.isPro && (
+                                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#B8FF01]/15 text-[#B8FF01]">
+                                    PRO
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => setSafetyPost(post)}
+                            className="p-1 text-zinc-500 hover:text-zinc-300 cursor-pointer"
+                          >
+                            <MoreHorizontal className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Fotos 3:4 */}
+                        {post.type === 'fotos' && (
+                          <div className="relative w-full aspect-[3/4] bg-black overflow-hidden">
+                            <img
+                              src={post.mediaUrl}
+                              alt={post.caption}
+                              className="w-full h-full object-cover"
+                            />
+
+                            {post.audioTrack && (
+                              <button
+                                onClick={() => setMuted(!muted)}
+                                className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-full flex items-center gap-1.5 text-[10px] text-zinc-200 cursor-pointer"
+                              >
+                                <Music className="w-3 h-3 text-[#B8FF01]" />
+                                <span>{post.audioTrack}</span>
+                              </button>
+                            )}
+
+                            {post.productTag && (
+                              <button
+                                onClick={() => setActiveProductHotspot(post)}
+                                style={{
+                                  left: `${post.productTag.x}%`,
+                                  top: `${post.productTag.y}%`,
+                                }}
+                                className="absolute -translate-x-1/2 -translate-y-1/2 bg-black/80 backdrop-blur-md border border-[#B8FF01] text-[#B8FF01] px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-[0_0_15px_rgba(184,255,1,0.4)] cursor-pointer animate-pulse"
+                              >
+                                <Tag className="w-2.5 h-2.5" />
+                                <span>{post.productTag.price}</span>
+                              </button>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Vídeos Curtos 9:16 */}
+                        {post.type === 'curtos' && (
+                          <div
+                            className="relative w-full aspect-[9/16] bg-black overflow-hidden select-none"
+                            onMouseDown={(e) => {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              if (e.clientX - rect.left > rect.width * 0.55) {
+                                setSpeed2xId(post.id);
+                              }
+                            }}
+                            onMouseUp={() => setSpeed2xId(null)}
+                            onMouseLeave={() => setSpeed2xId(null)}
+                            onTouchStart={(e) => {
+                              const touch = e.touches[0];
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              if (touch.clientX - rect.left > rect.width * 0.55) {
+                                setSpeed2xId(post.id);
+                              }
+                            }}
+                            onTouchEnd={() => setSpeed2xId(null)}
+                          >
+                            <img
+                              src={post.mediaUrl}
+                              alt={post.caption}
+                              className={`w-full h-full object-cover transition-transform duration-500 ${
+                                isPlaying ? 'scale-105' : 'scale-100'
+                              }`}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/20" />
+
+                            {speed2xId === post.id && (
+                              <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-black/80 border border-[#B8FF01] text-[#B8FF01] px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1">
+                                <FastForward className="w-3.5 h-3.5" />
+                                <span>Velocidade 2x</span>
+                              </div>
+                            )}
+
+                            <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                              <span className="bg-black/65 px-2 py-0.5 rounded-full text-[10px] text-zinc-300">
+                                {post.duration}
+                              </span>
+                              <button
+                                onClick={() => setMuted(!muted)}
+                                className="w-7 h-7 rounded-full bg-black/65 flex items-center justify-center text-zinc-200 cursor-pointer"
+                              >
+                                {muted ? (
+                                  <VolumeX className="w-3.5 h-3.5" />
+                                ) : (
+                                  <Volume2 className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                            </div>
+
+                            <button
+                              onClick={() =>
+                                setPlayingId(isPlaying ? null : post.id)
+                              }
+                              className="absolute inset-0 m-auto w-11 h-11 rounded-full bg-black/50 backdrop-blur-sm border border-white/15 flex items-center justify-center text-[#B8FF01] hover:scale-105 transition cursor-pointer"
+                            >
+                              {isPlaying ? (
+                                <Pause className="w-5 h-5" />
+                              ) : (
+                                <Play className="w-5 h-5 ml-0.5" />
+                              )}
+                            </button>
+
+                            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                              <span className="text-[10px] text-zinc-400">
+                                Segure à direita p/ 2x
+                              </span>
+                              <button
+                                onClick={() => setDuetSourcePost(post)}
+                                className="bg-black/75 border border-white/15 hover:border-[#B8FF01] text-zinc-100 px-2.5 py-1 rounded-full text-[10px] font-medium flex items-center gap-1 cursor-pointer"
+                              >
+                                <Columns2 className="w-3 h-3 text-[#B8FF01]" />
+                                <span>Dueto</span>
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Vídeos Longos 16:9 */}
+                        {post.type === 'longos' && (
+                          <div className="relative w-full aspect-[16/9] bg-black overflow-hidden">
+                            <img
+                              src={post.mediaUrl}
+                              alt={post.title || post.caption}
+                              className={`w-full h-full object-cover ${
+                                !post.unlocked ? 'blur-md scale-105 opacity-60' : ''
+                              }`}
+                            />
+
+                            {!post.unlocked ? (
+                              <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-4 text-center">
+                                <Lock className="w-5 h-5 text-[#B8FF01] mb-1.5" />
+                                <p className="text-xs font-semibold text-white">
+                                  Vídeo Longo Exclusivo (16:9)
+                                </p>
+                                <button
+                                  onClick={() =>
+                                    setCheckoutData({
+                                      kind: 'unlock_video',
+                                      postId: post.id,
+                                      title: post.title || 'Vídeo Exclusivo',
+                                      subtitle:
+                                        'Acesso vitalício na galeria (85% criador • 15% EXTEND)',
+                                      amountBrl: post.exclusivePrice,
+                                    })
+                                  }
+                                  className="mt-2.5 px-3.5 py-1.5 rounded-full bg-[#B8FF01] text-black text-xs font-bold hover:bg-[#c8ff33] transition cursor-pointer"
+                                >
+                                  Desbloquear • {formatBRL(post.exclusivePrice)}
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/25" />
+                                <button
+                                  onClick={() =>
+                                    setPlayingId(isPlaying ? null : post.id)
+                                  }
+                                  className="absolute inset-0 m-auto w-10 h-10 rounded-full bg-black/55 border border-white/15 flex items-center justify-center text-[#B8FF01] cursor-pointer"
+                                >
+                                  {isPlaying ? (
+                                    <Pause className="w-4 h-4" />
+                                  ) : (
+                                    <Play className="w-4 h-4 ml-0.5" />
+                                  )}
+                                </button>
+
+                                <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between gap-2">
+                                  <span className="text-[10px] bg-black/70 px-2 py-0.5 rounded text-zinc-300">
+                                    {post.duration}
+                                  </span>
+                                  <div className="flex items-center gap-1.5">
+                                    <button
+                                      onClick={() => setMiniPlayerPost(post)}
+                                      className="bg-black/75 border border-white/15 hover:border-[#B8FF01] text-zinc-200 px-2 py-1 rounded-full text-[10px] flex items-center gap-1 cursor-pointer"
+                                    >
+                                      <Minimize2 className="w-3 h-3 text-[#B8FF01]" />
+                                      <span>Mini</span>
+                                    </button>
+                                    <button
+                                      onClick={() => setFullscreenPost(post)}
+                                      className="bg-black/75 border border-white/15 hover:border-[#B8FF01] text-zinc-200 px-2.5 py-1 rounded-full text-[10px] flex items-center gap-1 cursor-pointer"
+                                    >
+                                      <Maximize2 className="w-3 h-3 text-[#B8FF01]" />
+                                      <span>Tela cheia</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Barra de Progressão Minimalista 3px */}
+                        <div className="w-full h-[3px] bg-white/10 overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-[#26C400] via-[#9EFF00] to-[#E6FF00] transition-all duration-500"
+                            style={{ width: `${post.progress}%` }}
+                          />
+                        </div>
+
+                        <div className="p-3.5 space-y-2.5">
+                          {post.title && (
+                            <h3 className="text-xs font-bold text-white leading-snug">
+                              {post.title}
+                            </h3>
+                          )}
+                          <p className="text-xs text-zinc-300 leading-relaxed">
+                            {post.caption}
+                          </p>
+
+                          {post.type === 'longos' &&
+                            post.unlocked &&
+                            post.chapters && (
+                              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                                {post.chapters.map((ch, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => setPlayingId(post.id)}
+                                    className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-zinc-400 hover:text-[#B8FF01] shrink-0 cursor-pointer"
+                                  >
+                                    {ch}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+
+                          {post.isCommercial && (
+                            <button
+                              onClick={() =>
+                                openCommercialChat(
+                                  post.author,
+                                  'Olá! Vi sua publicação comercial no EXTEND.'
+                                )
+                              }
+                              className="w-full py-2 rounded-xl bg-[#B8FF01] hover:bg-[#c8ff33] text-black text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer"
+                            >
+                              <MessageCircle className="w-3.5 h-3.5" />
+                              <span>{post.ctaLabel || 'Iniciar conversa'}</span>
+                            </button>
+                          )}
+
+                          <div className="pt-1 flex items-center justify-between gap-1 text-zinc-400">
+                            <div className="flex items-center gap-3">
+                              <button
+                                onClick={() => handleToggleLike(post.id)}
+                                className={`flex items-center gap-1 text-xs transition cursor-pointer ${
+                                  post.liked
+                                    ? 'text-[#B8FF01]'
+                                    : 'hover:text-zinc-200'
+                                }`}
+                              >
+                                <Heart
+                                  className="w-4 h-4"
+                                  filled={post.liked}
+                                />
+                                <span>{post.likes}</span>
+                              </button>
+
+                              <button
+                                onClick={() => setCommentPostId(post.id)}
+                                className="flex items-center gap-1 text-xs hover:text-zinc-200 transition cursor-pointer"
+                              >
+                                <MessageCircle className="w-4 h-4" />
+                                <span>{post.comments.length}</span>
+                              </button>
+
+                              <button
+                                onClick={() => handleExtendRepost(post.id)}
+                                className={`flex items-center gap-1 text-[11px] transition cursor-pointer ${
+                                  post.extendedByMe
+                                    ? 'text-[#B8FF01] font-semibold'
+                                    : 'hover:text-zinc-200'
+                                }`}
+                              >
+                                <Repeat2 className="w-4 h-4" />
+                                <span>Estender</span>
+                              </button>
+                            </div>
+
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={() => handleDailyBoost(post.id)}
+                                className={`px-2 py-1 rounded-full text-[10px] font-medium border transition cursor-pointer ${
+                                  dailyBoostUsed
+                                    ? 'border-white/5 text-zinc-600'
+                                    : 'border-[#B8FF01]/35 text-[#B8FF01] hover:bg-[#B8FF01]/10'
+                                }`}
+                              >
+                                + Impulso
+                              </button>
+
+                              {!post.isCommercial && (
+                                <button
+                                  onClick={() =>
+                                    setCheckoutData({
+                                      kind: 'support',
+                                      postId: post.id,
+                                      title: `Apoiar ${post.author}`,
+                                      subtitle:
+                                        'Impulso premiado direto ao criador (80% criador • 20% EXTEND)',
+                                      amountBrl: 5.0,
+                                    })
+                                  }
+                                  className="px-2 py-1 rounded-full text-[10px] font-medium bg-white/5 hover:bg-white/10 text-zinc-300 transition cursor-pointer"
+                                >
+                                  Apoiar
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* NOVA PUBLICAÇÃO */}
+              {nav === 'publicar' && (
+                <div className="px-4 pt-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-sm font-bold text-white">
+                      Nova Publicação
+                    </h2>
+                    <button
+                      onClick={() => setNav('feed')}
+                      className="p-1 text-zinc-400 hover:text-white cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-1.5 bg-[#11150E] p-1 rounded-full border border-white/5">
+                    {[
+                      { id: 'fotos', label: 'Foto (3:4)' },
+                      { id: 'curtos', label: 'Curto (9:16)' },
+                      { id: 'longos', label: 'Longo (16:9)' },
+                    ].map((fmt) => (
+                      <button
+                        key={fmt.id}
+                        onClick={() => setPubFormat(fmt.id)}
+                        className={`py-1.5 rounded-full text-[11px] font-semibold transition cursor-pointer ${
+                          pubFormat === fmt.id
+                            ? 'bg-[#B8FF01] text-black'
+                            : 'text-zinc-400 hover:text-zinc-200'
+                        }`}
+                      >
+                        {fmt.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="bg-[#11150E] rounded-2xl border border-white/5 p-3 flex flex-col items-center gap-3">
+                    <div
+                      className={`relative bg-black rounded-xl overflow-hidden border border-white/10 ${
+                        pubFormat === 'fotos'
+                          ? 'w-44 aspect-[3/4]'
+                          : pubFormat === 'curtos'
+                          ? 'w-36 aspect-[9/16]'
+                          : 'w-full aspect-[16/9]'
+                      }`}
+                    >
+                      <img
+                        src={pubPreviewUrl}
+                        alt="Prévia"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    <input
+                      ref={postMediaInputRef}
+                      type="file"
+                      accept="image/*,video/*"
+                      onChange={handlePostMediaUpload}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => postMediaInputRef.current?.click()}
+                      className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-zinc-200 flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-[#B8FF01]" />
+                      <span>Escolher foto ou vídeo do aparelho</span>
+                    </button>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] text-zinc-400 block">
+                      Direcionamento do disparo
+                    </span>
+                    <div className="grid grid-cols-3 gap-1.5 bg-[#11150E] p-1 rounded-full border border-white/5">
+                      {[
+                        { id: 'perto', label: 'Perto (Região)' },
+                        { id: 'brasil', label: 'Brasil' },
+                        { id: 'mundo', label: 'Mundo' },
+                      ].map((sc) => (
+                        <button
+                          key={sc.id}
+                          onClick={() => setPubScope(sc.id)}
+                          className={`py-1.5 rounded-full text-[11px] font-semibold transition cursor-pointer ${
+                            pubScope === sc.id
+                              ? 'bg-[#B8FF01] text-black'
+                              : 'text-zinc-400 hover:text-zinc-200'
+                          }`}
+                        >
+                          {sc.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {pubFormat === 'longos' && (
+                    <div className="space-y-2.5">
+                      <input
+                        type="text"
+                        value={pubTitle}
+                        onChange={(e) => setPubTitle(e.target.value)}
+                        placeholder="Título do vídeo longo (16:9)..."
+                        className="w-full bg-[#11150E] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#B8FF01]"
+                      />
+                      <div className="flex items-center justify-between bg-[#11150E] border border-white/10 rounded-xl px-3 py-2">
+                        <span className="text-[11px] text-zinc-300">
+                          Vídeo exclusivo pago (R$)
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={pubExclusivePrice}
+                          onChange={(e) => setPubExclusivePrice(e.target.value)}
+                          placeholder="0,00 (Grátis)"
+                          className="w-24 bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-xs text-right text-[#B8FF01] focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-2.5">
+                    <textarea
+                      rows={2}
+                      value={pubCaption}
+                      onChange={(e) => setPubCaption(e.target.value)}
+                      placeholder="Escreva uma legenda..."
+                      className="w-full bg-[#11150E] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#B8FF01]"
+                    />
+
+                    <div className="flex items-center gap-2 bg-[#11150E] border border-white/10 rounded-xl px-3 py-2">
+                      <Users className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                      <input
+                        type="text"
+                        value={pubCollab}
+                        onChange={(e) => setPubCollab(e.target.value)}
+                        placeholder="Convidar Collab (ex: @clara.luz)"
+                        className="w-full bg-transparent text-xs text-white placeholder-zinc-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between bg-[#11150E] border border-white/10 rounded-2xl px-3.5 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          isCommercialPost ? 'bg-amber-400' : 'bg-emerald-400'
+                        }`}
+                      />
+                      <span className="text-xs font-medium text-zinc-200">
+                        {isCommercialPost
+                          ? `Passe Comercial • US$ ${commercialPriceUsd} (${formatBRL(
+                              commercialPriceBrl
+                            )})`
+                          : 'Publicação Gratuita'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setManualCommercial(!isCommercialPost)}
+                      className="text-[11px] text-zinc-400 underline hover:text-[#B8FF01] cursor-pointer"
+                    >
+                      Alternar
+                    </button>
+                  </div>
+
+                  <div className="pt-1 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={handlePublishClick}
+                      className="px-7 py-2 rounded-full bg-[#B8FF01] hover:bg-[#c8ff33] text-black text-xs font-bold shadow-[0_0_18px_rgba(184,255,1,0.3)] transition cursor-pointer"
+                    >
+                      Publicar
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* MENSAGENS */}
+              {nav === 'chat' && (
+                <div className="px-3.5 pt-3 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-sm font-bold text-white">Mensagens</h2>
+                    <span className="text-[10px] text-zinc-400">
+                      Apenas conexões autorizadas
+                    </span>
+                  </div>
+
+                  <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                    {chats.map((c) => {
+                      const p = profiles[c.withHandle] || profiles['@clara.luz'];
+                      const isSelected = activeChat?.id === c.id;
+                      return (
+                        <button
+                          key={c.id}
+                          onClick={() => setActiveChatId(c.id)}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs shrink-0 transition cursor-pointer ${
+                            isSelected
+                              ? 'bg-[#B8FF01]/15 border-[#B8FF01] text-white'
+                              : 'bg-[#11150E] border-white/10 text-zinc-400'
+                          }`}
+                        >
+                          <img
+                            src={p.avatar}
+                            alt={p.name}
+                            className="w-5 h-5 rounded-full object-cover"
+                          />
+                          <span>{c.withHandle}</span>
+                          {c.status === 'pending' && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {activeChat && (
+                    <div className="bg-[#11150E] rounded-3xl border border-white/5 p-3.5 min-h-[380px] flex flex-col justify-between">
+                      <div className="flex items-center justify-between pb-2.5 border-b border-white/5">
+                        <button
+                          onClick={() =>
+                            openUserProfile(activeChat.withHandle, 'fotos')
+                          }
+                          className="flex items-center gap-2 text-left cursor-pointer"
+                        >
+                          <img
+                            src={
+                              (
+                                profiles[activeChat.withHandle] ||
+                                profiles['@clara.luz']
+                              ).avatar
+                            }
+                            alt=""
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                          <div>
+                            <p className="text-xs font-semibold text-white">
+                              {activeChat.withHandle}
+                            </p>
+                            <span className="text-[10px] text-[#B8FF01]">
+                              {activeChat.tag}
+                            </span>
+                          </div>
+                        </button>
+                      </div>
+
+                      {activeChat.status === 'pending' ? (
+                        <div className="my-auto py-8 text-center space-y-3">
+                          <Lock className="w-6 h-6 text-[#B8FF01] mx-auto" />
+                          <div className="space-y-1">
+                            <p className="text-xs font-semibold text-white">
+                              Solicitação de conexão de {activeChat.withHandle}
+                            </p>
+                            <p className="text-[11px] text-zinc-400">
+                              Motivo: {activeChat.tag}. O envio de texto está
+                              bloqueado até você permitir.
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-center gap-2 pt-1">
+                            <button
+                              onClick={() => {
+                                setChats((prev) =>
+                                  prev.map((c) =>
+                                    c.id === activeChat.id
+                                      ? { ...c, status: 'approved' }
+                                      : c
+                                  )
+                                );
+                                showToast('Conexão autorizada!');
+                              }}
+                              className="px-4 py-1.5 rounded-full bg-[#B8FF01] text-black text-xs font-bold cursor-pointer"
+                            >
+                              Aceitar
+                            </button>
+                            <button
+                              onClick={() => {
+                                setChats((prev) =>
+                                  prev.filter((c) => c.id !== activeChat.id)
+                                );
+                                showToast('Solicitação recusada.');
+                              }}
+                              className="px-4 py-1.5 rounded-full bg-white/5 text-zinc-300 text-xs cursor-pointer"
+                            >
+                              Recusar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex-1 py-3 space-y-2.5 overflow-y-auto max-h-[260px]">
+                            {activeChat.messages.map((m) => (
+                              <div
+                                key={m.id}
+                                className={`flex flex-col max-w-[82%] rounded-2xl px-3 py-2 text-xs ${
+                                  m.from === '@voce'
+                                    ? 'ml-auto bg-[#B8FF01] text-black font-medium'
+                                    : 'bg-white/5 text-zinc-200'
+                                }`}
+                              >
+                                <span>{m.text}</span>
+                                <span
+                                  className={`text-[9px] mt-0.5 self-end ${
+                                    m.from === '@voce'
+                                      ? 'text-black/60'
+                                      : 'text-zinc-500'
+                                  }`}
+                                >
+                                  {m.time}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+
+                          <form
+                            onSubmit={handleSendChatMessage}
+                            className="pt-2 border-t border-white/5 flex items-center gap-2"
+                          >
+                            <input
+                              type="text"
+                              value={chatInput}
+                              onChange={(e) => setChatInput(e.target.value)}
+                              placeholder="Escreva sua mensagem..."
+                              className="flex-1 bg-black/50 border border-white/10 rounded-full px-3.5 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#B8FF01]"
+                            />
+                            <button
+                              type="submit"
+                              className="w-8 h-8 rounded-full bg-[#B8FF01] text-black flex items-center justify-center shrink-0 cursor-pointer"
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                            </button>
+                          </form>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* GALERIA / PERFIL */}
+              {nav === 'perfil' && (
+                <div className="px-3.5 pt-3 space-y-4">
+                  {!isMyProfile && (
+                    <button
+                      onClick={() => setNav('feed')}
+                      className="flex items-center gap-1 text-xs text-zinc-400 hover:text-white cursor-pointer"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Voltar ao feed</span>
+                    </button>
+                  )}
+
+                  <div className="bg-[#11150E] rounded-3xl border border-white/5 p-4 space-y-3">
+                    <div className="flex items-center gap-3.5">
+                      <div className="relative shrink-0">
+                        <input
+                          ref={avatarInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleAvatarFileChange}
+                          className="hidden"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (isMyProfile) avatarInputRef.current?.click();
+                          }}
+                          className={`relative block rounded-full ${
+                            isMyProfile ? 'cursor-pointer group' : 'cursor-default'
+                          }`}
+                        >
+                          <img
+                            src={viewedProfile.avatar}
+                            alt={viewedProfile.name}
+                            className="w-16 h-16 rounded-full object-cover ring-2 ring-[#B8FF01]"
+                          />
+                          {isMyProfile && (
+                            <span className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#B8FF01] text-black flex items-center justify-center border-2 border-[#11150E]">
+                              <Camera className="w-3 h-3" />
+                            </span>
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <h2 className="text-sm font-bold text-white truncate">
+                            {viewedProfile.name}
+                          </h2>
+                          {viewedProfile.isPro && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#B8FF01]/15 text-[#B8FF01]">
+                              PRO
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-[#B8FF01]">
+                          {viewedProfile.handle}
+                        </p>
+                        <p className="text-[11px] text-zinc-400 mt-1 line-clamp-2">
+                          {viewedProfile.bio}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="w-full h-[3px] bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#26C400] to-[#B8FF01]"
+                        style={{ width: `${viewedProfile.progress}%` }}
+                      />
+                    </div>
+
+                    {isMyProfile ? (
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          onClick={() => setShowWalletModal(true)}
+                          className="flex-1 py-1.5 px-3 rounded-full bg-[#B8FF01]/15 border border-[#B8FF01]/40 text-[#B8FF01] text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Wallet className="w-3.5 h-3.5" />
+                          <span>Carteira • {formatBRL(walletBalance)}</span>
+                        </button>
+
+                        {!profiles['@voce'].isPro && (
+                          <button
+                            onClick={() => setShowProModal(true)}
+                            className="py-1.5 px-3 rounded-full bg-white/5 hover:bg-white/10 text-zinc-200 text-xs font-medium flex items-center gap-1 cursor-pointer"
+                          >
+                            <Crown className="w-3.5 h-3.5 text-[#B8FF01]" />
+                            <span>EXTEND Pro</span>
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="pt-1">
+                        <button
+                          onClick={() => setChatRequestTarget(viewedProfile.handle)}
+                          className="w-full py-2 rounded-full bg-[#B8FF01] text-black text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>Solicitar Chat</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                    {(viewedProfile.folders || ['Todas']).map((folder) => (
+                      <button
+                        key={folder}
+                        onClick={() => setSelectedFolder(folder)}
+                        className={`px-3 py-1 rounded-full text-[11px] flex items-center gap-1 shrink-0 border transition cursor-pointer ${
+                          selectedFolder === folder
+                            ? 'bg-[#B8FF01] text-black border-[#B8FF01] font-semibold'
+                            : 'bg-[#11150E] text-zinc-400 border-white/5'
+                        }`}
+                      >
+                        <Folder className="w-3 h-3" />
+                        <span>{folder}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-1 bg-[#11150E] p-1 rounded-full border border-white/5">
+                    {[
+                      { id: 'fotos', label: 'Fotos' },
+                      { id: 'curtos', label: 'Curtos' },
+                      { id: 'longos', label: 'Longos' },
+                    ].map((t) => (
+                      <button
+                        key={t.id}
+                        onClick={() => setProfileTab(t.id)}
+                        className={`py-1 rounded-full text-[11px] font-semibold transition cursor-pointer ${
+                          profileTab === t.id
+                            ? 'bg-[#B8FF01] text-black'
+                            : 'text-zinc-400'
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {profilePosts.length === 0 ? (
+                    <div className="py-10 text-center text-xs text-zinc-500">
+                      Nenhuma publicação nesta aba da galeria.
+                    </div>
+                  ) : (
+                    <div
+                      className={`grid gap-2 ${
+                        profileTab === 'longos' ? 'grid-cols-1' : 'grid-cols-2'
+                      }`}
+                    >
+                      {profilePosts.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => {
+                            setActiveTab(item.type);
+                            setNav('feed');
+                          }}
+                          className="group relative bg-[#11150E] rounded-2xl overflow-hidden border border-white/5 cursor-pointer"
+                        >
+                          <div
+                            className={`w-full overflow-hidden ${
+                              item.type === 'fotos'
+                                ? 'aspect-[3/4]'
+                                : item.type === 'curtos'
+                                ? 'aspect-[9/16]'
+                                : 'aspect-[16/9]'
+                            }`}
+                          >
+                            <img
+                              src={item.mediaUrl}
+                              alt={item.caption}
+                              className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                            />
+                          </div>
+                          <div className="w-full h-[3px] bg-white/10">
+                            <div
+                              className="h-full bg-[#B8FF01]"
+                              style={{ width: `${item.progress}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </main>
+
+            {/* MINI PLAYER FLUTUANTE 16:9 */}
+            {miniPlayerPost && (
+              <div className="fixed bottom-16 right-4 z-40 w-44 bg-[#11150E] border border-[#B8FF01]/50 rounded-2xl overflow-hidden shadow-2xl">
+                <div className="relative aspect-[16/9] bg-black">
+                  <img
+                    src={miniPlayerPost.mediaUrl}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    onClick={() => setMiniPlayerPost(null)}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/80 text-white flex items-center justify-center cursor-pointer"
+                  >
+                    <XIcon className="w-3 h-3" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setFullscreenPost(miniPlayerPost);
+                      setMiniPlayerPost(null);
+                    }}
+                    className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/80 text-[9px] text-[#B8FF01] cursor-pointer"
+                  >
+                    Expandir
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* BARRA INFERIOR COM ÍCONES REDONDOS E CENTRALIZADOS */}
+            <nav className="sticky bottom-0 z-30 bg-[#080B06]/95 backdrop-blur-md border-t border-white/5 px-4 py-2.5 flex items-center justify-center gap-5">
+              <button
+                onClick={() => setNav('feed')}
+                className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition cursor-pointer ${
+                  nav === 'feed'
+                    ? 'bg-[#B8FF01]/15 ring-1 ring-[#B8FF01]/60'
+                    : 'bg-[#11150E] border border-white/10 opacity-80 hover:opacity-100'
+                }`}
+                title="Feed EXTEND"
+              >
+                <ExtendIcon className="w-5 h-5" />
+              </button>
+
+              <button
+                onClick={() => setNav('publicar')}
+                className="w-9 h-9 rounded-full shrink-0 bg-[#B8FF01] hover:bg-[#c8ff33] text-[#060805] flex items-center justify-center shadow-[0_0_18px_rgba(184,255,1,0.45)] transition cursor-pointer"
+                title="Publicar"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+
+              <button
+                onClick={() => setNav('chat')}
+                className={`relative w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition cursor-pointer ${
+                  nav === 'chat'
+                    ? 'bg-[#B8FF01]/15 text-[#B8FF01] ring-1 ring-[#B8FF01]/60'
+                    : 'bg-[#11150E] border border-white/10 text-zinc-400 hover:text-[#B8FF01]'
+                }`}
+                title="Mensagens"
+              >
+                <MessageCircle className="w-4 h-4" />
+                {chats.some((c) => c.status === 'pending') && (
+                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#B8FF01]" />
+                )}
+              </button>
+
+              <button
+                onClick={() => openUserProfile('@voce', 'fotos')}
+                className={`h-9 flex items-center gap-1.5 pl-1.5 pr-3 rounded-full border shrink-0 transition cursor-pointer ${
+                  nav === 'perfil' && isMyProfile
+                    ? 'border-[#B8FF01] bg-[#11150E] text-[#B8FF01]'
+                    : 'border-white/10 bg-[#11150E] text-zinc-300 hover:border-[#B8FF01]/40'
+                }`}
+                title="Galeria"
+              >
+                <img
+                  src={profiles['@voce'].avatar}
+                  alt="Galeria"
+                  className="w-6 h-6 rounded-full object-cover"
+                />
+                <span className="text-[11px] font-medium">Galeria</span>
+              </button>
+            </nav>
+
+            {/* MODAIS */}
+            {fullscreenPost && (
+              <div className="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-white">
+                    {fullscreenPost.title}
+                  </span>
+                  <button
+                    onClick={() => setFullscreenPost(null)}
+                    className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white cursor-pointer"
+                  >
+                    <XIcon className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="w-full max-w-2xl mx-auto aspect-[16/9] bg-black rounded-2xl overflow-hidden border border-white/10 relative">
+                  <img
+                    src={fullscreenPost.mediaUrl}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-0 inset-x-0 h-[3px] bg-white/15">
+                    <div
+                      className="h-full bg-[#B8FF01]"
+                      style={{ width: `${fullscreenPost.progress}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-center gap-2 flex-wrap">
+                  {(fullscreenPost.chapters || []).map((ch, idx) => (
+                    <span
+                      key={idx}
+                      className="text-[11px] px-3 py-1 rounded-full bg-white/10 text-zinc-200"
+                    >
+                      {ch}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeProductHotspot && activeProductHotspot.productTag && (
+              <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+                <div className="w-full max-w-xs bg-[#11150E] border border-white/10 rounded-3xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#B8FF01]">
+                      Produto na Foto
+                    </span>
+                    <button
+                      onClick={() => setActiveProductHotspot(null)}
+                      className="text-zinc-400 hover:text-white cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className="text-sm font-semibold text-white">
+                    {activeProductHotspot.productTag.name}
+                  </p>
+                  <p className="text-base font-bold text-[#B8FF01]">
+                    {activeProductHotspot.productTag.price}
+                  </p>
+                  <button
+                    onClick={() =>
+                      openCommercialChat(
+                        activeProductHotspot.author,
+                        `Olá! Tenho interesse no item: ${activeProductHotspot.productTag.name} (${activeProductHotspot.productTag.price}).`
+                      )
+                    }
+                    className="w-full py-2 rounded-full bg-[#B8FF01] text-black text-xs font-bold cursor-pointer"
+                  >
+                    Iniciar conversa comercial
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {duetSourcePost && (
+              <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+                <div className="w-full max-w-xs bg-[#11150E] border border-white/10 rounded-3xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-white">
+                      Dueto 9:16 com {duetSourcePost.author}
+                    </span>
+                    <button
+                      onClick={() => setDuetSourcePost(null)}
+                      className="text-zinc-400 cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1 aspect-[9/10] rounded-2xl overflow-hidden bg-black border border-white/10">
+                    <img
+                      src={duetSourcePost.mediaUrl}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                    <img
+                      src={profiles['@voce'].avatar}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <input
+                    type="text"
+                    value={duetCaption}
+                    onChange={(e) => setDuetCaption(e.target.value)}
+                    placeholder="Legenda do seu dueto..."
+                    className="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-2 text-xs text-white"
+                  />
+
+                  <button
+                    onClick={handlePublishDuet}
+                    className="w-full py-2 rounded-full bg-[#B8FF01] text-black text-xs font-bold cursor-pointer"
+                  >
+                    Publicar
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {commentPost && (
+              <div className="fixed inset-0 z-50 bg-black/80 flex items-end sm:items-center justify-center p-4">
+                <div className="w-full max-w-sm bg-[#11150E] border border-white/10 rounded-3xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-white">
+                      Comentários
+                    </span>
+                    <button
+                      onClick={() => setCommentPostId(null)}
+                      className="text-zinc-400 cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {commentPost.comments.length === 0 ? (
+                      <p className="text-xs text-zinc-500 text-center py-4">
+                        Seja o primeiro a comentar.
+                      </p>
+                    ) : (
+                      commentPost.comments.map((c) => (
+                        <div
+                          key={c.id}
+                          className="bg-white/5 rounded-xl px-3 py-2 text-xs"
+                        >
+                          <span className="font-semibold text-[#B8FF01] mr-1.5">
+                            {c.user}
+                          </span>
+                          <span className="text-zinc-200">{c.text}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <form onSubmit={handleAddComment} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={commentDraft}
+                      onChange={(e) => setCommentDraft(e.target.value)}
+                      placeholder="Adicionar comentário..."
+                      className="flex-1 bg-black/50 border border-white/10 rounded-full px-3 py-1.5 text-xs text-white"
+                    />
+                    <button
+                      type="submit"
+                      className="px-3 py-1.5 rounded-full bg-[#B8FF01] text-black text-xs font-bold cursor-pointer"
+                    >
+                      Enviar
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {checkoutData && (
+              <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+                <div className="w-full max-w-xs bg-[#11150E] border border-[#B8FF01]/30 rounded-3xl p-4 space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#B8FF01]">
+                      Pagamento Instantâneo
+                    </span>
+                    <button
+                      onClick={() => setCheckoutData(null)}
+                      className="text-zinc-400 cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-bold text-white">
+                      {checkoutData.title}
+                    </p>
+                    <p className="text-[11px] text-zinc-400 mt-0.5">
+                      {checkoutData.subtitle}
+                    </p>
+                    <p className="text-lg font-extrabold text-[#B8FF01] mt-2">
+                      {formatBRL(checkoutData.amountBrl)}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5 bg-black/40 p-1 rounded-full">
+                    <button
+                      onClick={() => setPaymentMethod('pix')}
+                      className={`py-1 rounded-full text-[11px] font-semibold flex items-center justify-center gap-1 cursor-pointer ${
+                        paymentMethod === 'pix'
+                          ? 'bg-[#B8FF01] text-black'
+                          : 'text-zinc-400'
+                      }`}
+                    >
+                      <QrCode className="w-3 h-3" />
+                      <span>Pix</span>
+                    </button>
+                    <button
+                      onClick={() => setPaymentMethod('card')}
+                      className={`py-1 rounded-full text-[11px] font-semibold flex items-center justify-center gap-1 cursor-pointer ${
+                        paymentMethod === 'card'
+                          ? 'bg-[#B8FF01] text-black'
+                          : 'text-zinc-400'
+                      }`}
+                    >
+                      <CreditCard className="w-3 h-3" />
+                      <span>Cartão</span>
+                    </button>
+                  </div>
+
+                  {paymentMethod === 'pix' ? (
+                    <div className="bg-black/50 border border-white/10 rounded-2xl p-3 text-center space-y-2">
+                      <div className="w-24 h-24 mx-auto bg-white rounded-xl flex items-center justify-center text-black">
+                        <QrCode className="w-16 h-16" />
+                      </div>
+                      <button
+                        onClick={copyPixCode}
+                        className="w-full py-1.5 rounded-full bg-white/10 text-[11px] text-zinc-200 flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Copy className="w-3 h-3 text-[#B8FF01]" />
+                        <span>
+                          {copiedPix ? 'Código Pix copiado!' : 'Copiar código Pix'}
+                        </span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="bg-black/50 border border-white/10 rounded-2xl p-3 text-xs text-zinc-300">
+                      Cartão final •••• 4829 pronto para aprovação em 1 toque.
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleConfirmPayment}
+                    className="w-full py-2 rounded-full bg-[#B8FF01] text-black text-xs font-bold cursor-pointer"
+                  >
+                    Confirmar Pagamento
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {showWalletModal && (
+              <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+                <div className="w-full max-w-sm bg-[#11150E] border border-white/10 rounded-3xl p-4 space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-white">
+                      Carteira do Criador
+                    </span>
+                    <button
+                      onClick={() => setShowWalletModal(false)}
+                      className="text-zinc-400 cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="bg-black/50 rounded-2xl p-3 border border-[#B8FF01]/20">
+                    <span className="text-[11px] text-zinc-400">
+                      Saldo disponível para saque
+                    </span>
+                    <p className="text-xl font-extrabold text-[#B8FF01]">
+                      {formatBRL(walletBalance)}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                    {transactions.map((tx) => (
+                      <div
+                        key={tx.id}
+                        className="flex items-center justify-between bg-white/5 rounded-xl px-3 py-2 text-[11px]"
+                      >
+                        <div>
+                          <p className="text-zinc-200 font-medium">{tx.label}</p>
+                          <span className="text-[10px] text-zinc-500">
+                            {tx.splitInfo}
+                          </span>
+                        </div>
+                        <span className="font-bold text-[#B8FF01]">
+                          +{formatBRL(tx.net)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={pixWithdrawKey}
+                      onChange={(e) => setPixWithdrawKey(e.target.value)}
+                      placeholder="Sua chave Pix..."
+                      className="flex-1 bg-black/50 border border-white/10 rounded-full px-3 py-1.5 text-xs text-white"
+                    />
+                    <button
+                      onClick={() => {
+                        if (walletBalance <= 0) return;
+                        setWalletBalance(0);
+                        setShowWalletModal(false);
+                        showToast('Transferência Pix solicitada!');
+                      }}
+                      className="px-3.5 py-1.5 rounded-full bg-[#B8FF01] text-black text-xs font-bold cursor-pointer"
+                    >
+                      Sacar Pix
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showProModal && (
+              <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+                <div className="w-full max-w-xs bg-[#11150E] border border-[#B8FF01]/30 rounded-3xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#B8FF01] flex items-center gap-1">
+                      <Crown className="w-3.5 h-3.5" />
+                      EXTEND Pro
+                    </span>
+                    <button
+                      onClick={() => setShowProModal(false)}
+                      className="text-zinc-400 cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-zinc-300 leading-relaxed">
+                    Inclui 5 Passes Comerciais por mês, selo PRO verificado e
+                    respostas rápidas no chat comercial.
+                  </p>
+                  <button
+                    onClick={() =>
+                      setCheckoutData({
+                        kind: 'pro_plan',
+                        title: 'Assinatura EXTEND Pro',
+                        subtitle: '5 Passes Comerciais inclusos todo mês',
+                        amountBrl: 69.9,
+                      })
+                    }
+                    className="w-full py-2 rounded-full bg-[#B8FF01] text-black text-xs font-bold cursor-pointer"
+                  >
+                    Assinar • R$ 69,90/mês
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {chatRequestTarget && (
+              <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+                <div className="w-full max-w-xs bg-[#11150E] border border-white/10 rounded-3xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-white">
+                      Conectar com {chatRequestTarget}
+                    </span>
+                    <button
+                      onClick={() => setChatRequestTarget(null)}
+                      className="text-zinc-400 cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-zinc-400">
+                    Escolha o motivo para pedir permissão de mensagem:
+                  </p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {['Amizade', 'Trabalho / Orçamento', 'Parceria', 'Dúvida'].map(
+                      (tag) => (
+                        <button
+                          key={tag}
+                          onClick={() =>
+                            handleRequestChatConnection(chatRequestTarget, tag)
+                          }
+                          className="py-2 px-2.5 rounded-xl bg-white/5 hover:bg-[#B8FF01] hover:text-black text-[11px] font-medium text-zinc-200 transition cursor-pointer"
+                        >
+                          {tag}
+                        </button>
+                      )
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showAccountModal && (
+              <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+                <div className="w-full max-w-xs bg-[#11150E] border border-white/10 rounded-3xl p-4 space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ExtendIcon className="w-6 h-6" />
+                      <span className="text-xs font-bold text-white">
+                        Minha Conta
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setShowAccountModal(false)}
+                      className="text-zinc-400 cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white"
+                      placeholder="Seu nome"
+                    />
+                    <input
+                      type="text"
+                      value={editHandle}
+                      onChange={(e) => setEditHandle(e.target.value)}
+                      className="w-full bg-black/50 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-[#B8FF01]"
+                      placeholder="@seu.arroba"
+                    />
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setProfiles((prev) => ({
+                        ...prev,
+                        '@voce': {
+                          ...prev['@voce'],
+                          name: editName || 'Você',
+                        },
+                      }));
+                      setShowAccountModal(false);
+                      showToast('Dados da conta salvos!');
+                    }}
+                    className="w-full py-2 rounded-full bg-[#B8FF01] text-black text-xs font-bold cursor-pointer"
+                  >
+                    Salvar Perfil
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {showMobileModal && (
+              <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+                <div className="w-full max-w-xs bg-[#11150E] border border-white/10 rounded-3xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ExtendIcon className="w-6 h-6" />
+                      <span className="text-xs font-bold text-white">
+                        Instalar no Celular
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setShowMobileModal(false)}
+                      className="text-zinc-400 cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-zinc-300 leading-relaxed">
+                    No navegador do celular, toque no menu (Chrome) ou em
+                    Compartilhar (Safari) e escolha{' '}
+                    <span className="text-[#B8FF01] font-semibold">
+                      Adicionar à Tela de Início
+                    </span>{' '}
+                    para instalar o ícone oficial do EXTEND.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setMobileFrameMode(!mobileFrameMode);
+                      setShowMobileModal(false);
+                    }}
+                    className="w-full py-2 rounded-full bg-[#B8FF01] text-black text-xs font-bold cursor-pointer"
+                  >
+                    {mobileFrameMode
+                      ? 'Sair da Moldura Celular'
+                      : 'Simular Moldura Celular Aqui'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {showSearchModal && (
+              <div className="fixed inset-0 z-50 bg-black/85 flex items-start justify-center p-4 pt-14">
+                <div className="w-full max-w-xs bg-[#11150E] border border-white/10 rounded-3xl p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      autoFocus
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Buscar criadores (@)..."
+                      className="flex-1 bg-black/50 border border-white/10 rounded-full px-3 py-1.5 text-xs text-white"
+                    />
+                    <button
+                      onClick={() => setShowSearchModal(false)}
+                      className="text-zinc-400 cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="space-y-1.5">
+                    {Object.values(profiles)
+                      .filter(
+                        (p) =>
+                          p.name
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase()) ||
+                          p.handle
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase())
+                      )
+                      .map((p) => (
+                        <button
+                          key={p.handle}
+                          onClick={() => {
+                            setShowSearchModal(false);
+                            openUserProfile(p.handle, 'fotos');
+                          }}
+                          className="w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-white/5 text-left cursor-pointer"
+                        >
+                          <img
+                            src={p.avatar}
+                            alt=""
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                          <div>
+                            <p className="text-xs font-semibold text-white">
+                              {p.name}
+                            </p>
+                            <p className="text-[10px] text-[#B8FF01]">{p.handle}</p>
+                          </div>
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {showNotificationsModal && (
+              <div className="fixed inset-0 z-50 bg-black/85 flex items-start justify-center p-4 pt-14">
+                <div className="w-full max-w-xs bg-[#11150E] border border-white/10 rounded-3xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-white">Atividade</span>
+                    <button
+                      onClick={() => setShowNotificationsModal(false)}
+                      className="text-zinc-400 cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="space-y-2 text-[11px] text-zinc-300">
+                    <div className="p-2.5 rounded-xl bg-white/5">
+                      Sua foto <span className="text-[#B8FF01]">Geometria noturna</span>{' '}
+                      avançou na barra de alcance.
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-white/5">
+                      <span className="text-[#B8FF01]">@lucas.cine</span> enviou uma
+                      solicitação de chat.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeStoryHandle && (
+              <div className="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between p-4">
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={() => {
+                      const h = activeStoryHandle;
+                      setActiveStoryHandle(null);
+                      openUserProfile(h, 'fotos');
+                    }}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <img
+                      src={
+                        (profiles[activeStoryHandle] || profiles['@voce']).avatar
+                      }
+                      alt=""
+                      className="w-8 h-8 rounded-full object-cover ring-1 ring-[#B8FF01]"
+                    />
+                    <span className="text-xs font-bold text-white">
+                      {activeStoryHandle}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setActiveStoryHandle(null)}
+                    className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white cursor-pointer"
+                  >
+                    <XIcon className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="w-full max-w-xs mx-auto aspect-[9/16] rounded-3xl overflow-hidden border border-[#B8FF01]/40">
+                  <img
+                    src={
+                      (profiles[activeStoryHandle] || profiles['@voce']).avatar
+                    }
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                <div className="text-center text-[11px] text-zinc-400">
+                  Toque no perfil acima para abrir a Galeria
+                </div>
+              </div>
+            )}
+
+            {safetyPost && (
+              <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+                <div className="w-full max-w-xs bg-[#11150E] border border-white/10 rounded-3xl p-4 space-y-2">
+                  <div className="flex items-center justify-between pb-1">
+                    <span className="text-xs font-bold text-white">
+                      Opções da publicação
+                    </span>
+                    <button
+                      onClick={() => setSafetyPost(null)}
+                      className="text-zinc-400 cursor-pointer"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setSafetyPost(null);
+                      showToast('Conteúdo sinalizado para revisão.');
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-zinc-200 flex items-center gap-2 cursor-pointer"
+                  >
+                    <Flag className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Sinalizar como comercial ou impróprio</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPosts((prev) =>
+                        prev.filter((p) => p.author !== safetyPost.author)
+                      );
+                      setSafetyPost(null);
+                      showToast(`Perfil ${safetyPost.author} bloqueado.`);
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-red-500/20 text-xs text-red-400 flex items-center gap-2 cursor-pointer"
+                  >
+                    <Ban className="w-3.5 h-3.5" />
+                    <span>Bloquear {safetyPost.author}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
